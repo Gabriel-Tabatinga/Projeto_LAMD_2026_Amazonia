@@ -7,6 +7,17 @@ app.listen(port, () => {
   console.log(`Conexão backend funcionando na porta: ${port}`);
 });
 
+//Produtos
+
+//Lista de produtos disponíveis
+app.get('/produtos', (req, res) => {
+});
+
+//Informações individuais de um produto
+app.get('/produtos/{idItem}', (req, res) => {
+});
+
+
 //Pedido
 
 //Criação do pedido
@@ -20,7 +31,6 @@ app.put('/order', (req, res) => {
 //Get individual pedidos infos para o cliente
 app.get('/order/client', (req, res) => {
 });
-
 
 //Solicitação
 
