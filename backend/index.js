@@ -43,6 +43,49 @@ const db = new sqlite3.Database('./amazonia.db', (err) => {
     }
 });
 
+const amqp = require('amqplib');
+
+// ==========================================
+// CONFIGURAÇÃO DO RABBITMQ (MOM)
+// ==========================================
+let canalRabbitMQ;
+
+async function conectarRabbitMQ() {
+    try {
+        const urlMOM = process.env.CLOUDAMQP_URL || 'amqp://localhost'; //api.cloudamqp.com
+        
+        const conexao = await amqp.connect(urlMOM);
+        canalRabbitMQ = await conexao.createChannel();
+        
+        // Declarando as filas
+        await canalRabbitMQ.assertQueue('fila_novos_pedidos');
+        await canalRabbitMQ.assertQueue('fila_atualizacao_status');
+        
+        console.log('Conectado ao RabbitMQ com sucesso!');
+
+        // CONSUMIDORES
+        canalRabbitMQ.consume('fila_novos_pedidos', (msg) => {
+            if (msg !== null) {
+                const dados = JSON.parse(msg.content.toString());
+                console.log(`\n[MOM - Consumidor] 📦 Processando assincronamente o NOVO PEDIDO ID: ${dados.pedido_id}`);
+                // Push Notification para os entregadores TODO
+                canalRabbitMQ.ack(msg); // Confirma que a mensagem foi lida
+            }
+        });
+
+        canalRabbitMQ.consume('fila_atualizacao_status', (msg) => {
+            if (msg !== null) {
+                const dados = JSON.parse(msg.content.toString());
+                console.log(`\n[MOM - Consumidor] 🔄 Notificando cliente que o PEDIDO ID: ${dados.pedido_id} mudou para: ${dados.status}`);
+                canalRabbitMQ.ack(msg);
+            }
+        });
+
+    } catch (erro) {
+        console.error('Erro ao conectar no RabbitMQ:', erro);
+    }
+}
+conectarRabbitMQ();
 
 // PRODUTOS
 
