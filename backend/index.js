@@ -45,9 +45,7 @@ const db = new sqlite3.Database('./amazonia.db', (err) => {
 
 const amqp = require('amqplib');
 
-// ==========================================
 // CONFIGURAÇÃO DO RABBITMQ (MOM)
-// ==========================================
 let canalRabbitMQ;
 
 async function conectarRabbitMQ() {
