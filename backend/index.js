@@ -50,7 +50,7 @@ let canalRabbitMQ;
 
 async function conectarRabbitMQ() {
     try {
-        const urlMOM = process.env.CLOUDAMQP_URL || 'amqp://localhost'; //api.cloudamqp.com
+        const urlMOM = process.env.CLOUDAMQP_URL; //|| 'amqp://localhost'; //api.cloudamqp.com
         
         const conexao = await amqp.connect(urlMOM);
         canalRabbitMQ = await conexao.createChannel();
@@ -115,6 +115,18 @@ app.post('/order', (req, res) => {
     
     db.run(sql, [cliente_id, produto_id], function(err) {
         if (err) return res.status(500).json({ error: err.message });
+        
+        const evento = JSON.stringify({ 
+            evento: 'pedido_criado', 
+            pedido_id: this.lastID, 
+            cliente_id, 
+            produto_id 
+        });
+        
+        if (canalRabbitMQ) {
+            canalRabbitMQ.sendToQueue('fila_novos_pedidos', Buffer.from(evento));
+        }
+
         res.status(201).json({ mensagem: 'Pedido criado!', pedido_id: this.lastID });
     });
 });
@@ -154,12 +166,24 @@ app.get('/request/supplier', (req, res) => {
 // Aceite do pedido pelo prestador, criando a solicitação
 app.post('/request/supplier/:idPedido/accept', (req, res) => {
     const { idPedido } = req.params;
-    const { prestador_id } = req.body; // Quem está aceitando
+    const { prestador_id } = req.body;
 
     const sql = `UPDATE pedidos SET status = 'aceito', prestador_id = ? WHERE id = ? AND status = 'pendente'`;
     db.run(sql, [prestador_id, idPedido], function(err) {
         if (err) return res.status(500).json({ error: err.message });
         if (this.changes === 0) return res.status(400).json({ error: 'Pedido indisponível para aceite.' });
+        
+        const evento = JSON.stringify({ 
+            evento: 'pedido_aceito', 
+            pedido_id: idPedido, 
+            prestador_id, 
+            status: 'aceito' 
+        });
+        
+        if (canalRabbitMQ) {
+            canalRabbitMQ.sendToQueue('fila_atualizacao_status', Buffer.from(evento));
+        }
+
         res.json({ mensagem: 'Pedido aceito com sucesso!' });
     });
 });
