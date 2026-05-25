@@ -205,6 +205,16 @@ app.put('/request/supplier/ongoing/:idPedido/status', (req, res) => {
     db.run(sql, [idPedido], function(err) {
         if (err) return res.status(500).json({ error: err.message });
         if (this.changes === 0) return res.status(400).json({ error: 'Não foi possível atualizar o status.' });
+        
+        const evento = JSON.stringify({ 
+            evento: 'pedido_concluido', 
+            pedido_id: idPedido, 
+            status: 'concluido' 
+        });
+        if (canalRabbitMQ) {
+            canalRabbitMQ.sendToQueue('fila_atualizacao_status', Buffer.from(evento));
+        }
+
         res.json({ mensagem: 'Entrega concluída!' });
     });
 });
