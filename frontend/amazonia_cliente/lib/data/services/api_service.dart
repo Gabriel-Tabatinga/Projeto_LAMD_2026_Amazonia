@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter/foundation.dart';
 import '../models/produto_model.dart';
+import '../models/pedido_model.dart';
 
 class ApiService {
   static const String baseUrl = kIsWeb
@@ -29,5 +30,19 @@ class ApiService {
     );
 
     return response.statusCode == 201;
+  }
+
+  // Função para buscar os pedidos do cliente (GET /order/client/:clienteId)
+  Future<List<Pedido>> fetchMeusPedidos(int clienteId) async {
+    final response = await http.get(
+      Uri.parse('$baseUrl/order/client/$clienteId'),
+    );
+
+    if (response.statusCode == 200) {
+      List jsonResponse = json.decode(response.body);
+      return jsonResponse.map((item) => Pedido.fromJson(item)).toList();
+    } else {
+      throw Exception('Falha ao carregar pedidos.');
+    }
   }
 }

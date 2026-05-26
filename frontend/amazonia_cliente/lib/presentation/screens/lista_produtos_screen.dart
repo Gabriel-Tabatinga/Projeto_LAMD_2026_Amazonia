@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../data/models/produto_model.dart';
 import '../../data/services/api_service.dart';
-import 'detalhes_produto_screen.dart'; // Importe a nova tela que vamos criar
+import 'detalhes_produto_screen.dart';
+import 'meus_pedidos_screen.dart';
 
 class ListaProdutosScreen extends StatefulWidget {
   const ListaProdutosScreen({super.key});
@@ -25,6 +26,20 @@ class _ListaProdutosScreenState extends State<ListaProdutosScreen> {
       appBar: AppBar(
         title: const Text('Amazonia.com - Produtos'),
         backgroundColor: Colors.blueAccent,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.receipt_long),
+            tooltip: 'Meus Pedidos',
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const MeusPedidosScreen(),
+                ),
+              );
+            },
+          ),
+        ],
       ),
       body: FutureBuilder<List<Produto>>(
         future: futureProdutos,
