@@ -1,0 +1,78 @@
+import 'package:flutter/material.dart';
+import '../../data/models/produto_model.dart';
+import '../../data/services/api_service.dart';
+import 'detalhes_produto_screen.dart'; // Importe a nova tela que vamos criar
+
+class ListaProdutosScreen extends StatefulWidget {
+  const ListaProdutosScreen({super.key});
+
+  @override
+  State<ListaProdutosScreen> createState() => _ListaProdutosScreenState();
+}
+
+class _ListaProdutosScreenState extends State<ListaProdutosScreen> {
+  late Future<List<Produto>> futureProdutos;
+
+  @override
+  void initState() {
+    super.initState();
+    futureProdutos = ApiService().fetchProdutos();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Amazonia.com - Produtos'),
+        backgroundColor: Colors.blueAccent,
+      ),
+      body: FutureBuilder<List<Produto>>(
+        future: futureProdutos,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Center(child: Text('Erro ao carregar: ${snapshot.error}'));
+          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return const Center(
+              child: Text('Nenhum produto disponível no momento.'),
+            );
+          }
+
+          List<Produto> produtos = snapshot.data!;
+
+          return ListView.builder(
+            itemCount: produtos.length,
+            itemBuilder: (context, index) {
+              Produto produto = produtos[index];
+              return Card(
+                margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                child: ListTile(
+                  leading: const Icon(
+                    Icons.inventory_2,
+                    color: Colors.blueAccent,
+                  ),
+                  title: Text(
+                    produto.nome,
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  subtitle: Text('R\$ ${produto.preco.toStringAsFixed(2)}'),
+                  trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            DetalhesProdutoScreen(produto: produto),
+                      ),
+                    );
+                  },
+                ),
+              );
+            },
+          );
+        },
+      ),
+    );
+  }
+}
