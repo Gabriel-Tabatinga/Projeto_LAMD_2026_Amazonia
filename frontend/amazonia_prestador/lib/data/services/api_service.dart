@@ -45,9 +45,46 @@ class ApiService {
       throw Exception('Falha ao carregar pedidos.');
     }
   }
-  Future<bool> cancelarPedido(int pedidoId) async {
+
+  // Buscar pedidos pendentes para o Entregador (GET /request/supplier)
+  Future<List<Pedido>> fetchPedidosPendentes() async {
+    final response = await http.get(Uri.parse('$baseUrl/request/supplier'));
+
+    if (response.statusCode == 200) {
+      List jsonResponse = json.decode(response.body);
+      return jsonResponse.map((item) => Pedido.fromJson(item)).toList();
+    } else {
+      throw Exception('Falha ao carregar solicitações pendentes.');
+    }
+  }
+
+  // Aceitar um pedido (POST /request/supplier/:id/accept)
+  Future<bool> aceitarPedido(int pedidoId, int prestadorId) async {
+    final response = await http.post(
+      Uri.parse('$baseUrl/request/supplier/$pedidoId/accept'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({'prestador_id': prestadorId}),
+    );
+    
+    return response.statusCode == 200;
+  }
+  
+  // Buscar entregas em andamento do prestador (GET /request/supplier/:prestadorId/ongoing)
+  Future<List<Pedido>> fetchEntregasEmAndamento(int prestadorId) async {
+    final response = await http.get(Uri.parse('$baseUrl/request/supplier/$prestadorId/ongoing'));
+
+    if (response.statusCode == 200) {
+      List jsonResponse = json.decode(response.body);
+      return jsonResponse.map((item) => Pedido.fromJson(item)).toList();
+    } else {
+      throw Exception('Falha ao carregar entregas em andamento.');
+    }
+  }
+
+  // Concluir a entrega (PUT /request/supplier/ongoing/:idPedido/status)
+  Future<bool> concluirEntrega(int pedidoId) async {
     final response = await http.put(
-      Uri.parse('$baseUrl/order/$pedidoId'),
+      Uri.parse('$baseUrl/request/supplier/ongoing/$pedidoId/status'),
     );
     
     return response.statusCode == 200;
