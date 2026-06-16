@@ -14,7 +14,7 @@ class PrestadorApp extends StatelessWidget {
       title: 'Amazonia.com - Entregador',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        primarySwatch: Colors.orange, // Cor diferente para você não confundir os apps!
+        primarySwatch: Colors.orange,
         useMaterial3: true,
       ),
       home: const SolicitacoesPendentesScreen(),

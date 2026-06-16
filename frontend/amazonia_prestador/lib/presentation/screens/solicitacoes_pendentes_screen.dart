@@ -42,7 +42,7 @@ class _SolicitacoesPendentesScreenState extends State<SolicitacoesPendentesScree
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Painel do Entregador'),
+        title: const Text('Amazonia.com - Entregador'),
         backgroundColor: Colors.orangeAccent,
         actions: [
           IconButton(
