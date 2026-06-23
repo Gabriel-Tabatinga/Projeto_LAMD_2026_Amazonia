@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'presentation/screens/solicitacoes_pendentes_screen.dart';
+import 'presentation/screens/login_screen.dart';
 
 void main() {
   runApp(const PrestadorApp());
@@ -17,7 +17,7 @@ class PrestadorApp extends StatelessWidget {
         primarySwatch: Colors.orange,
         useMaterial3: true,
       ),
-      home: const SolicitacoesPendentesScreen(),
+      home: const LoginScreen(),
     );
   }
 }

@@ -34,6 +34,27 @@ const db = new sqlite3.Database('./amazonia.db', (err) => {
             status TEXT DEFAULT 'pendente', -- pendente, aceito, concluido, cancelado
             prestador_id INTEGER
         )`);
+
+        //Criação usuario
+        db.run(`CREATE TABLE IF NOT EXISTS usuarios (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            email TEXT UNIQUE NOT NULL,
+            senha TEXT NOT NULL,
+            tipo TEXT NOT NULL -- 'cliente' ou 'entregador'
+        )`, (err) => {
+            if (!err) {
+                db.get(`SELECT COUNT(*) AS count FROM usuarios`, (err, row) => {
+                    if (row && row.count === 0) {
+                        const senhaHash = require('bcryptjs').hashSync('123456', 10);
+                        const insertSql = `INSERT INTO usuarios (email, senha, tipo) VALUES (?, ?, ?)`;
+                        
+                        db.run(insertSql, ['cliente@amazonia.com', senhaHash, 'cliente']);
+                        db.run(insertSql, ['entregador@amazonia.com', senhaHash, 'entregador']);
+                        console.log('👤 Usuários de teste criados com sucesso!');
+                    }
+                });
+            }
+        });
     }
 });
 

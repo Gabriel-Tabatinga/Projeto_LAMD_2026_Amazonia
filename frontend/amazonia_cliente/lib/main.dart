@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'presentation/screens/lista_produtos_screen.dart';
+import 'presentation/screens/login_screen.dart';
 
 void main() {
   runApp(const AmazoniaApp());
@@ -18,7 +18,7 @@ class AmazoniaApp extends StatelessWidget {
         useMaterial3: true,
       ),
       // Define a tela inicial do app
-      home: ListaProdutosScreen(),
+      home: const LoginScreen(),
     );
   }
 }

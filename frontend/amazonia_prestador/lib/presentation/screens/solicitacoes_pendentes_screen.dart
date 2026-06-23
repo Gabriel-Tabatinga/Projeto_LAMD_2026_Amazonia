@@ -4,6 +4,7 @@ import '../../data/models/pedido_model.dart';
 import '../../data/services/api_service.dart';
 import 'detalhes_solicitacao_screen.dart';
 import 'entregas_em_andamento_screen.dart';
+import 'login_screen.dart';
 
 class SolicitacoesPendentesScreen extends StatefulWidget {
   const SolicitacoesPendentesScreen({super.key});
@@ -42,16 +43,26 @@ class _SolicitacoesPendentesScreenState extends State<SolicitacoesPendentesScree
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Amazonia.com - Entregador'),
+        title: const Text('Painel do Entregador'),
         backgroundColor: Colors.orangeAccent,
         actions: [
           IconButton(
             icon: const Icon(Icons.moped),
             tooltip: 'Entregas em Andamento',
             onPressed: () {
-              Navigator.push(
+              Navigator.push(context, MaterialPageRoute(builder: (context) => const EntregasEmAndamentoScreen()));
+            },
+          ),
+          IconButton(
+            icon: const Icon(Icons.logout),
+            tooltip: 'Sair',
+            onPressed: () async {
+              await ApiService().logout();
+              if (!context.mounted) return;
+              Navigator.pushAndRemoveUntil(
                 context,
-                MaterialPageRoute(builder: (context) => const EntregasEmAndamentoScreen()),
+                MaterialPageRoute(builder: (context) => const LoginScreen()),
+                (route) => false,
               );
             },
           ),

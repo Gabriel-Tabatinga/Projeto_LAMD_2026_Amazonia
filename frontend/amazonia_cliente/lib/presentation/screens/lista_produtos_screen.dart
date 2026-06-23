@@ -3,6 +3,7 @@ import '../../data/models/produto_model.dart';
 import '../../data/services/api_service.dart';
 import 'detalhes_produto_screen.dart';
 import 'meus_pedidos_screen.dart';
+import 'login_screen.dart';
 
 class ListaProdutosScreen extends StatefulWidget {
   const ListaProdutosScreen({super.key});
@@ -33,9 +34,23 @@ class _ListaProdutosScreenState extends State<ListaProdutosScreen> {
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(
-                  builder: (context) => const MeusPedidosScreen(),
-                ),
+                MaterialPageRoute(builder: (context) => const MeusPedidosScreen()),
+              );
+            },
+          ),
+          IconButton(
+            icon: const Icon(Icons.logout),
+            tooltip: 'Sair',
+            onPressed: () async {
+              // Apaga o token do cofre
+              await ApiService().logout();
+              
+              if (!context.mounted) return;
+              // Redireciona para o Login e destrói as telas anteriores
+              Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(builder: (context) => const LoginScreen()),
+                (route) => false,
               );
             },
           ),
